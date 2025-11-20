@@ -6,6 +6,7 @@
 export const MODEL_NAMES = {
   GEMINI_PRO: "gemini-1.5-pro",
   GEMINI_FLASH: "gemini-1.5-flash",
+  GEMINI_25_FLASH: "gemini-2.5-flash",
   TEST_MODEL: "test-model",
 } as const;
 
@@ -92,6 +93,11 @@ export const TEST_CONFIGS = {
     timeout: 45000,
     suggestions: { enabled: true, waitWindow: 0 },
   },
+  GOOGLE_WITH_MODEL: {
+    apiKey: TEST_API_KEYS.GOOGLE,
+    modelName: MODEL_NAMES.GEMINI_25_FLASH,
+    timeout: DEFAULT_TIMEOUTS.DEFAULT,
+  },
   WCA: {
     apiEndpoint: API_ENDPOINTS.WCA_DEFAULT,
     suggestions: { enabled: true, waitWindow: 0 },
@@ -99,5 +105,12 @@ export const TEST_CONFIGS = {
   BASE_TEST: {
     apiKey: TEST_API_KEYS.TEST_KEY,
   },
+} as const;
+
+// Google provider specific constants
+export const GOOGLE_PROVIDER = {
+  NAME: "google",
+  DISPLAY_NAME: "Google Gemini",
+  PROVIDER_NAME: "Google Gemini",
 } as const;
 
