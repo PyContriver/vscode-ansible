@@ -17,16 +17,12 @@ const mockAnsibleContextModule = {
   },
 };
 
-// Store original require - MUST be done before any imports that use require()
+// Store original require as the import uses require()
 const originalRequire = Module.prototype.require;
 
-// Patch require() immediately to intercept "../ansibleContext" calls
-// This must happen before base.js is imported
+// Workaround to patch require() immediately to intercept "../ansibleContext" calls and this must happen before base.js is imported
 Module.prototype.require = function (this: any, id: string) {
   // Intercept the require call for "../ansibleContext"
-  // This handles both "../ansibleContext" and resolved absolute paths
-  // Node.js resolves relative paths, so we check for both the relative path
-  // and the resolved path that includes "ansibleContext"
   const normalizedId = id.replace(/\\/g, "/");
   if (
     id === "../ansibleContext" ||

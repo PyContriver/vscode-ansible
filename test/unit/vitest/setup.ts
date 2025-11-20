@@ -1,6 +1,5 @@
 import { vi } from "vitest";
 
-// This will be used as a fallback if individual test files don't provide their own mock
 vi.mock("vscode", () => ({
   commands: {
     executeCommand: vi.fn(),
@@ -49,42 +48,3 @@ vi.mock("vscode", () => ({
     sessionId: "test-session-id",
   },
 }));
-
-// Mock AnsibleContextProcessor for tests that use base.ts which uses require()
-// Path from test/unit/vitest/setup.ts to src/features/lightspeed/ansibleContext.js
-// Mock with both .js extension and without to handle both import and require()
-vi.mock("../../../src/features/lightspeed/ansibleContext.js", () => {
-  const enhancePromptForAnsible = vi.fn((prompt: string, context?: string) => {
-    return `enhanced: ${prompt} with context: ${context || "none"}`;
-  });
-  
-  const cleanAnsibleOutput = vi.fn((output: string) => {
-    return output.trim().replace(/^```ya?ml\s*/i, "").replace(/```\s*$/, "");
-  });
-
-  return {
-    AnsibleContextProcessor: {
-      enhancePromptForAnsible,
-      cleanAnsibleOutput,
-    },
-  };
-});
-
-// // Also mock without extension for require() compatibility
-// vi.mock("../../../src/features/lightspeed/ansibleContext", () => {
-//   const enhancePromptForAnsible = vi.fn((prompt: string, context?: string) => {
-//     return `enhanced: ${prompt} with context: ${context || "none"}`;
-//   });
-  
-//   const cleanAnsibleOutput = vi.fn((output: string) => {
-//     return output.trim().replace(/^```ya?ml\s*/i, "").replace(/```\s*$/, "");
-//   });
-
-//   return {
-//     AnsibleContextProcessor: {
-//       enhancePromptForAnsible,
-//       cleanAnsibleOutput,
-//     },
-//   };
-// });
-
