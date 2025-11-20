@@ -3389,6 +3389,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:^8.46.2"
     "@typescript-eslint/parser": "npm:^8.46.2"
     "@vitejs/plugin-vue": "npm:^6.0.1"
+    "@vitest/coverage-v8": "npm:^4.0.4"
     "@vscode-elements/elements": "npm:^2.0.0"
     "@vscode/test-cli": "npm:^0.0.12"
     "@vscode/test-electron": "npm:^2.5.2"
@@ -3437,6 +3438,7 @@ __metadata:
     typescript-eslint: "npm:^8.46.2"
     uuid: "npm:^13.0.0"
     vite: "npm:^7.1.12"
+    vitest: "npm:^4.0.4"
     vscode-extension-tester: "npm:^8.18.0"
     vscode-languageclient: "npm:^9.0.1"
     vscode-uri: "npm:^3.1.0"
@@ -6121,6 +6123,22 @@ __metadata:
   bin:
     glob: dist/esm/bin.mjs
   checksum: 10/da4501819633daff8822c007bb3f93d5c4d2cbc7b15a8e886660f4497dd251a1fb4f53a85fba1e760b31704eff7164aeb2c7a82db10f9f2c362d12c02fe52cf3
+  languageName: node
+  linkType: hard
+
+"glob@npm:^12.0.0":
+  version: 12.0.0
+  resolution: "glob@npm:12.0.0"
+  dependencies:
+    foreground-child: "npm:^3.3.1"
+    jackspeak: "npm:^4.1.1"
+    minimatch: "npm:^10.1.1"
+    minipass: "npm:^7.1.2"
+    package-json-from-dist: "npm:^1.0.0"
+    path-scurry: "npm:^2.0.0"
+  bin:
+    glob: dist/esm/bin.mjs
+  checksum: 10/6e21b3f1f1fa635836d45e54bbe50704884cc3e310e0cc011cfb5429db65a030e12936d99b07e66236370efe45dc8c8b26fa5334dbf555d6f8709e0315c77c30
   languageName: node
   linkType: hard
 
