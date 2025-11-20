@@ -1,86 +1,12 @@
 /**
- * Test constants and mock data for playbook and role generation tests
+ * Test constants and mock data for provider factory and base provider tests
  */
-
-// Common test prompts
-export const TEST_PROMPTS = {
-  INSTALL_NGINX: "Create a playbook to install nginx on Ubuntu servers",
-  INSTALL_NGINX_SIMPLE: "Create a playbook to install nginx",
-  SETUP_WEB_SERVER: "Create a playbook to set up a web server",
-} as const;
-
-// Common test outlines
-export const TEST_OUTLINES = {
-  NGINX_INSTALL: "1. Update apt cache\n2. Install nginx\n3. Start and enable nginx service",
-  WEB_SERVER_SETUP: "1. Install Apache\n2. Configure firewall\n3. Start Apache service",
-  EMPTY: "",
-} as const;
-
-// Common generation IDs for testing
-export const TEST_GENERATION_IDS = {
-  NGINX_123: "test-generation-id-123",
-  NGINX_456: "test-generation-id-456",
-  WEB_SERVER_789: "test-generation-id-789",
-} as const;
-
-// Mock playbook content templates
-export const MOCK_PLAYBOOK_CONTENT = {
-  NGINX_INSTALL: `---
-- name: Install nginx on Ubuntu servers
-  hosts: all
-  become: yes
-  tasks:
-    - name: Update apt cache
-      ansible.builtin.apt:
-        update_cache: yes
-
-    - name: Install nginx
-      ansible.builtin.apt:
-        name: nginx
-        state: present
-
-    - name: Start and enable nginx service
-      ansible.builtin.systemd:
-        name: nginx
-        state: started
-        enabled: yes
-`,
-
-  WEB_SERVER_SETUP: `---
-- name: Set up web server
-  hosts: all
-  become: yes
-  tasks:
-    - name: Install Apache
-      ansible.builtin.apt:
-        name: apache2
-        state: present
-
-    - name: Configure firewall
-      ansible.builtin.ufw:
-        rule: allow
-        port: "80"
-        proto: tcp
-
-    - name: Start Apache service
-      ansible.builtin.systemd:
-        name: apache2
-        state: started
-        enabled: yes
-`,
-} as const;
-
-// Common error messages
-export const ERROR_MESSAGES = {
-  INVALID_API_KEY: "API key is invalid or expired",
-  GENERATION_FAILED: "Playbook generation failed",
-  PROVIDER_ERROR: "Provider not initialized",
-} as const;
 
 // Model names
 export const MODEL_NAMES = {
   GEMINI_PRO: "gemini-1.5-pro",
   GEMINI_FLASH: "gemini-1.5-flash",
+  TEST_MODEL: "test-model",
 } as const;
 
 // Provider types (only WCA and Google are supported in factory)
@@ -95,14 +21,63 @@ export const API_ENDPOINTS = {
   WCA_DEFAULT: "https://c.ai.ansible.redhat.com",
 } as const;
 
-// Default models
-export const DEFAULT_MODELS = {
-  GOOGLE: "gemini-2.5-flash",
-} as const;
-
 // Test API keys
 export const TEST_API_KEYS = {
   GOOGLE: "AIzaSyTest-google-key-12345",
+  TEST_KEY: "test-key",
+} as const;
+
+// Test provider information
+export const TEST_PROVIDER_INFO = {
+  NAME: "test-provider",
+  DISPLAY_NAME: "Test Provider",
+  PROVIDER_NAME: "TestProvider",
+} as const;
+
+// Test responses and IDs
+export const TEST_RESPONSES = {
+  COMPLETION: "test completion",
+  MESSAGE: "test response",
+  SUGGESTION_ID: "test-suggestion-id",
+  CONVERSATION_ID_DEFAULT: "default-id",
+} as const;
+
+// Test prompts
+export const TEST_PROMPTS = {
+  INSTALL_NGINX: "Install nginx",
+  CREATE_TASK: "Create a task",
+  CREATE_ROLE: "Create a role",
+  TEST_PROMPT: "test prompt",
+  GENERIC: "Test prompt",
+} as const;
+
+// Test content
+export const TEST_CONTENT = {
+  PLAYBOOK: "---\n- name: test playbook",
+  ROLE: "---\n- name: test role",
+  OUTLINE_DEFAULT: "1. Test step",
+} as const;
+
+// Test operations
+export const TEST_OPERATIONS = {
+  GENERIC: "test-operation",
+} as const;
+
+// HTTP status codes for error testing
+export const HTTP_STATUS_CODES = {
+  BAD_REQUEST: 400,
+  FORBIDDEN: 403,
+  RATE_LIMIT: 429,
+  INTERNAL_SERVER_ERROR: 500,
+  SERVICE_UNAVAILABLE: 503,
+  GATEWAY_TIMEOUT: 504,
+  TEAPOT: 418, // For testing unknown status codes
+} as const;
+
+// Default timeouts
+export const DEFAULT_TIMEOUTS = {
+  DEFAULT: 30000,
+  CUSTOM: 60000,
 } as const;
 
 // Test configuration objects
@@ -120,6 +95,9 @@ export const TEST_CONFIGS = {
   WCA: {
     apiEndpoint: API_ENDPOINTS.WCA_DEFAULT,
     suggestions: { enabled: true, waitWindow: 0 },
+  },
+  BASE_TEST: {
+    apiKey: TEST_API_KEYS.TEST_KEY,
   },
 } as const;
 

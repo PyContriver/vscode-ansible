@@ -64,11 +64,23 @@ import {
   CompletionRequestParams,
   CompletionResponseParams,
 } from "../../../../../src/interfaces/lightspeed.js";
+import {
+  TEST_API_KEYS,
+  TEST_PROVIDER_INFO,
+  MODEL_NAMES,
+  TEST_RESPONSES,
+  TEST_PROMPTS,
+  TEST_CONTENT,
+  TEST_OPERATIONS,
+  HTTP_STATUS_CODES,
+  DEFAULT_TIMEOUTS,
+  TEST_CONFIGS,
+} from "../testConstants.js";
 
 // Create a concrete implementation of BaseLLMProvider for testing
 class TestProvider extends BaseLLMProvider {
-  readonly name = "test-provider";
-  readonly displayName = "Test Provider";
+  readonly name = TEST_PROVIDER_INFO.NAME;
+  readonly displayName = TEST_PROVIDER_INFO.DISPLAY_NAME;
 
   async validateConfig(): Promise<boolean> {
     return this.config?.apiKey !== undefined;
@@ -81,7 +93,7 @@ class TestProvider extends BaseLLMProvider {
       error: isValid ? undefined : "Invalid configuration",
       modelInfo: isValid
         ? {
-            name: "test-model",
+            name: MODEL_NAMES.TEST_MODEL,
             version: "1.0",
             capabilities: ["completion", "chat"],
           }
@@ -93,16 +105,16 @@ class TestProvider extends BaseLLMProvider {
     params: CompletionRequestParams,
   ): Promise<CompletionResponseParams> {
     return {
-      predictions: ["test completion"],
-      suggestionId: params.suggestionId || "test-suggestion-id",
+      predictions: [TEST_RESPONSES.COMPLETION],
+      suggestionId: params.suggestionId || TEST_RESPONSES.SUGGESTION_ID,
     };
   }
 
   async chatRequest(params: ChatRequestParams): Promise<ChatResponseParams> {
     return {
-      message: "test response",
-      conversationId: params.conversationId || "default-id",
-      model: "test-model",
+      message: TEST_RESPONSES.MESSAGE,
+      conversationId: params.conversationId || TEST_RESPONSES.CONVERSATION_ID_DEFAULT,
+      model: MODEL_NAMES.TEST_MODEL,
     };
   }
 
@@ -110,9 +122,9 @@ class TestProvider extends BaseLLMProvider {
     params: GenerationRequestParams,
   ): Promise<GenerationResponseParams> {
     return {
-      content: "---\n- name: test playbook",
-      outline: params.outline || "1. Test step",
-      model: "test-model",
+      content: TEST_CONTENT.PLAYBOOK,
+      outline: params.outline || TEST_CONTENT.OUTLINE_DEFAULT,
+      model: MODEL_NAMES.TEST_MODEL,
     };
   }
 
@@ -120,9 +132,9 @@ class TestProvider extends BaseLLMProvider {
     params: GenerationRequestParams,
   ): Promise<GenerationResponseParams> {
     return {
-      content: "---\n- name: test role",
-      outline: params.outline || "1. Test step",
-      model: "test-model",
+      content: TEST_CONTENT.ROLE,
+      outline: params.outline || TEST_CONTENT.OUTLINE_DEFAULT,
+      model: MODEL_NAMES.TEST_MODEL,
     };
   }
 
@@ -160,25 +172,25 @@ class TestProvider extends BaseLLMProvider {
 describe("BaseLLMProvider", () => {
   describe("Constructor", () => {
     it("should initialize with config and default timeout", () => {
-      const config = { apiKey: "test-key" };
+      const config = TEST_CONFIGS.BASE_TEST;
       const provider = new TestProvider(config);
 
       expect(provider.getConfig()).toEqual(config);
-      expect(provider.getTimeout()).toBe(30000);
+      expect(provider.getTimeout()).toBe(DEFAULT_TIMEOUTS.DEFAULT);
     });
 
     it("should initialize with custom timeout", () => {
-      const config = { apiKey: "test-key" };
-      const provider = new TestProvider(config, 60000);
+      const config = TEST_CONFIGS.BASE_TEST;
+      const provider = new TestProvider(config, DEFAULT_TIMEOUTS.CUSTOM);
 
-      expect(provider.getTimeout()).toBe(60000);
+      expect(provider.getTimeout()).toBe(DEFAULT_TIMEOUTS.CUSTOM);
     });
   });
 
   describe("applyAnsibleContext", () => {
     it("should enhance prompt with Ansible context", () => {
-      const provider = new TestProvider({ apiKey: "test-key" });
-      const prompt = "Install nginx";
+      const provider = new TestProvider(TEST_CONFIGS.BASE_TEST);
+      const prompt = TEST_PROMPTS.INSTALL_NGINX;
       const metadata = {
         ansibleFileType: "playbook",
         context: "existing context",
@@ -191,8 +203,8 @@ describe("BaseLLMProvider", () => {
     });
 
     it("should handle prompt without metadata", () => {
-      const provider = new TestProvider({ apiKey: "test-key" });
-      const prompt = "Install nginx";
+      const provider = new TestProvider(TEST_CONFIGS.BASE_TEST);
+      const prompt = TEST_PROMPTS.INSTALL_NGINX;
 
       const result = provider.testApplyAnsibleContext(prompt);
 
@@ -201,8 +213,8 @@ describe("BaseLLMProvider", () => {
     });
 
     it("should handle metadata with documentUri and workspaceContext", () => {
-      const provider = new TestProvider({ apiKey: "test-key" });
-      const prompt = "Create a task";
+      const provider = new TestProvider(TEST_CONFIGS.BASE_TEST);
+      const prompt = TEST_PROMPTS.CREATE_TASK;
       const metadata = {
         ansibleFileType: "role",
         documentUri: "file:///test.yml",
@@ -217,8 +229,8 @@ describe("BaseLLMProvider", () => {
     });
 
     it("should default fileType to playbook when not provided", () => {
-      const provider = new TestProvider({ apiKey: "test-key" });
-      const prompt = "Test prompt";
+      const provider = new TestProvider(TEST_CONFIGS.BASE_TEST);
+      const prompt = TEST_PROMPTS.GENERIC;
       const metadata = {};
 
       const result = provider.testApplyAnsibleContext(prompt, metadata);
@@ -229,7 +241,7 @@ describe("BaseLLMProvider", () => {
 
   describe("cleanAnsibleOutput", () => {
     it("should clean YAML code blocks from output", () => {
-      const provider = new TestProvider({ apiKey: "test-key" });
+      const provider = new TestProvider(TEST_CONFIGS.BASE_TEST);
       const output = "```yaml\n---\n- name: test\n```";
 
       const result = provider.testCleanAnsibleOutput(output);
@@ -239,7 +251,7 @@ describe("BaseLLMProvider", () => {
     });
 
     it("should clean YML code blocks from output", () => {
-      const provider = new TestProvider({ apiKey: "test-key" });
+      const provider = new TestProvider(TEST_CONFIGS.BASE_TEST);
       const output = "```yml\n---\n- name: test\n```";
 
       const result = provider.testCleanAnsibleOutput(output);
@@ -248,7 +260,7 @@ describe("BaseLLMProvider", () => {
     });
 
     it("should trim whitespace from output", () => {
-      const provider = new TestProvider({ apiKey: "test-key" });
+      const provider = new TestProvider(TEST_CONFIGS.BASE_TEST);
       const output = "   \n---\n- name: test\n   ";
 
       const result = provider.testCleanAnsibleOutput(output);
@@ -258,7 +270,7 @@ describe("BaseLLMProvider", () => {
     });
 
     it("should handle empty output", () => {
-      const provider = new TestProvider({ apiKey: "test-key" });
+      const provider = new TestProvider(TEST_CONFIGS.BASE_TEST);
       const output = "";
 
       const result = provider.testCleanAnsibleOutput(output);
@@ -269,175 +281,175 @@ describe("BaseLLMProvider", () => {
 
   describe("handleHttpError", () => {
     it("should handle 400 Bad Request", () => {
-      const provider = new TestProvider({ apiKey: "test-key" });
-      const error = { status: 400, message: "Invalid request" };
+      const provider = new TestProvider(TEST_CONFIGS.BASE_TEST);
+      const error = { status: HTTP_STATUS_CODES.BAD_REQUEST, message: "Invalid request" };
 
       const result = provider.testHandleHttpError(
         error,
-        "test-operation",
-        "TestProvider",
+        TEST_OPERATIONS.GENERIC,
+        TEST_PROVIDER_INFO.PROVIDER_NAME,
       );
 
       expect(result).toBeInstanceOf(Error);
       expect(result.message).toContain("Bad request");
-      expect(result.message).toContain("test-operation");
+      expect(result.message).toContain(TEST_OPERATIONS.GENERIC);
     });
 
     it("should handle 403 Forbidden", () => {
-      const provider = new TestProvider({ apiKey: "test-key" });
-      const error = { status: 403 };
+      const provider = new TestProvider(TEST_CONFIGS.BASE_TEST);
+      const error = { status: HTTP_STATUS_CODES.FORBIDDEN };
 
       const result = provider.testHandleHttpError(
         error,
-        "test-operation",
-        "TestProvider",
+        TEST_OPERATIONS.GENERIC,
+        TEST_PROVIDER_INFO.PROVIDER_NAME,
       );
 
       expect(result).toBeInstanceOf(Error);
       expect(result.message).toContain("Forbidden");
       expect(result.message).toContain("API key");
-      expect(result.message).toContain("test-operation");
-      expect(result.message).toContain("403");
+      expect(result.message).toContain(TEST_OPERATIONS.GENERIC);
+      expect(result.message).toContain(String(HTTP_STATUS_CODES.FORBIDDEN));
     });
 
     it("should handle 429 Rate Limit", () => {
-      const provider = new TestProvider({ apiKey: "test-key" });
-      const error = { status: 429 };
+      const provider = new TestProvider(TEST_CONFIGS.BASE_TEST);
+      const error = { status: HTTP_STATUS_CODES.RATE_LIMIT };
 
       const result = provider.testHandleHttpError(
         error,
-        "test-operation",
-        "TestProvider",
+        TEST_OPERATIONS.GENERIC,
+        TEST_PROVIDER_INFO.PROVIDER_NAME,
       );
 
       expect(result).toBeInstanceOf(Error);
       expect(result.message).toContain("Rate limit exceeded");
-      expect(result.message).toContain("test-operation");
-      expect(result.message).toContain("429");
+      expect(result.message).toContain(TEST_OPERATIONS.GENERIC);
+      expect(result.message).toContain(String(HTTP_STATUS_CODES.RATE_LIMIT));
     });
 
     it("should handle 500 Internal Server Error", () => {
-      const provider = new TestProvider({ apiKey: "test-key" });
-      const error = { status: 500, message: "Server error" };
+      const provider = new TestProvider(TEST_CONFIGS.BASE_TEST);
+      const error = { status: HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR, message: "Server error" };
 
       const result = provider.testHandleHttpError(
         error,
-        "test-operation",
-        "TestProvider",
+        TEST_OPERATIONS.GENERIC,
+        TEST_PROVIDER_INFO.PROVIDER_NAME,
       );
 
       expect(result).toBeInstanceOf(Error);
-      expect(result.message).toContain("TestProvider");
+      expect(result.message).toContain(TEST_PROVIDER_INFO.PROVIDER_NAME);
       expect(result.message).toContain("unexpected error");
-      expect(result.message).toContain("test-operation");
+      expect(result.message).toContain(TEST_OPERATIONS.GENERIC);
     });
 
     it("should handle 503 Service Unavailable", () => {
-      const provider = new TestProvider({ apiKey: "test-key" });
-      const error = { status: 503 };
+      const provider = new TestProvider(TEST_CONFIGS.BASE_TEST);
+      const error = { status: HTTP_STATUS_CODES.SERVICE_UNAVAILABLE };
 
       const result = provider.testHandleHttpError(
         error,
-        "test-operation",
-        "TestProvider",
+        TEST_OPERATIONS.GENERIC,
+        TEST_PROVIDER_INFO.PROVIDER_NAME,
       );
 
       expect(result).toBeInstanceOf(Error);
       expect(result.message).toContain("Service unavailable");
-      expect(result.message).toContain("TestProvider");
-      expect(result.message).toContain("test-operation");
-      expect(result.message).toContain("503");
+      expect(result.message).toContain(TEST_PROVIDER_INFO.PROVIDER_NAME);
+      expect(result.message).toContain(TEST_OPERATIONS.GENERIC);
+      expect(result.message).toContain(String(HTTP_STATUS_CODES.SERVICE_UNAVAILABLE));
     });
 
     it("should handle 504 Gateway Timeout", () => {
-      const provider = new TestProvider({ apiKey: "test-key" });
-      const error = { status: 504 };
+      const provider = new TestProvider(TEST_CONFIGS.BASE_TEST);
+      const error = { status: HTTP_STATUS_CODES.GATEWAY_TIMEOUT };
 
       const result = provider.testHandleHttpError(
         error,
-        "test-operation",
-        "TestProvider",
+        TEST_OPERATIONS.GENERIC,
+        TEST_PROVIDER_INFO.PROVIDER_NAME,
       );
 
       expect(result).toBeInstanceOf(Error);
       expect(result.message).toContain("Gateway timeout");
-      expect(result.message).toContain("test-operation");
-      expect(result.message).toContain("504");
+      expect(result.message).toContain(TEST_OPERATIONS.GENERIC);
+      expect(result.message).toContain(String(HTTP_STATUS_CODES.GATEWAY_TIMEOUT));
     });
 
     it("should handle unknown status codes", () => {
-      const provider = new TestProvider({ apiKey: "test-key" });
-      const error = { status: 418, message: "I'm a teapot" };
+      const provider = new TestProvider(TEST_CONFIGS.BASE_TEST);
+      const error = { status: HTTP_STATUS_CODES.TEAPOT, message: "I'm a teapot" };
 
       const result = provider.testHandleHttpError(
         error,
-        "test-operation",
-        "TestProvider",
+        TEST_OPERATIONS.GENERIC,
+        TEST_PROVIDER_INFO.PROVIDER_NAME,
       );
 
       expect(result).toBeInstanceOf(Error);
-      expect(result.message).toContain("TestProvider error");
-      expect(result.message).toContain("test-operation");
-      expect(result.message).toContain("418");
+      expect(result.message).toContain(`${TEST_PROVIDER_INFO.PROVIDER_NAME} error`);
+      expect(result.message).toContain(TEST_OPERATIONS.GENERIC);
+      expect(result.message).toContain(String(HTTP_STATUS_CODES.TEAPOT));
     });
 
     it("should handle errors without status code", () => {
-      const provider = new TestProvider({ apiKey: "test-key" });
+      const provider = new TestProvider(TEST_CONFIGS.BASE_TEST);
       const error = { message: "Network error" };
 
       const result = provider.testHandleHttpError(
         error,
-        "test-operation",
-        "TestProvider",
+        TEST_OPERATIONS.GENERIC,
+        TEST_PROVIDER_INFO.PROVIDER_NAME,
       );
 
       expect(result).toBeInstanceOf(Error);
-      expect(result.message).toContain("TestProvider error");
+      expect(result.message).toContain(`${TEST_PROVIDER_INFO.PROVIDER_NAME} error`);
       expect(result.message).toContain("Network error");
-      expect(result.message).toContain("test-operation");
+      expect(result.message).toContain(TEST_OPERATIONS.GENERIC);
       expect(result.message).toContain("N/A");
     });
 
     it("should handle errors without message", () => {
-      const provider = new TestProvider({ apiKey: "test-key" });
-      const error = { status: 500 };
+      const provider = new TestProvider(TEST_CONFIGS.BASE_TEST);
+      const error = { status: HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR };
 
       const result = provider.testHandleHttpError(
         error,
-        "test-operation",
-        "TestProvider",
+        TEST_OPERATIONS.GENERIC,
+        TEST_PROVIDER_INFO.PROVIDER_NAME,
       );
 
       expect(result).toBeInstanceOf(Error);
-      expect(result.message).toContain("TestProvider");
+      expect(result.message).toContain(TEST_PROVIDER_INFO.PROVIDER_NAME);
       expect(result.message).toContain("unexpected error");
       expect(result.message).toContain("Unknown error");
     });
 
     it("should use default provider name when not provided", () => {
-      const provider = new TestProvider({ apiKey: "test-key" });
-      const error = { status: 500, message: "Error" };
+      const provider = new TestProvider(TEST_CONFIGS.BASE_TEST);
+      const error = { status: HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR, message: "Error" };
 
-      const result = provider.testHandleHttpError(error, "test-operation");
+      const result = provider.testHandleHttpError(error, TEST_OPERATIONS.GENERIC);
 
       expect(result).toBeInstanceOf(Error);
-      expect(result.message).toContain("test-operation");
+      expect(result.message).toContain(TEST_OPERATIONS.GENERIC);
     });
   });
 
   describe("Abstract methods implementation", () => {
     it("should have name property", () => {
-      const provider = new TestProvider({ apiKey: "test-key" });
-      expect(provider.name).toBe("test-provider");
+      const provider = new TestProvider(TEST_CONFIGS.BASE_TEST);
+      expect(provider.name).toBe(TEST_PROVIDER_INFO.NAME);
     });
 
     it("should have displayName property", () => {
-      const provider = new TestProvider({ apiKey: "test-key" });
-      expect(provider.displayName).toBe("Test Provider");
+      const provider = new TestProvider(TEST_CONFIGS.BASE_TEST);
+      expect(provider.displayName).toBe(TEST_PROVIDER_INFO.DISPLAY_NAME);
     });
 
     it("should validate config correctly", async () => {
-      const provider = new TestProvider({ apiKey: "test-key" });
+      const provider = new TestProvider(TEST_CONFIGS.BASE_TEST);
       const result = await provider.validateConfig();
       expect(result).toBe(true);
     });
@@ -449,12 +461,12 @@ describe("BaseLLMProvider", () => {
     });
 
     it("should get status with valid config", async () => {
-      const provider = new TestProvider({ apiKey: "test-key" });
+      const provider = new TestProvider(TEST_CONFIGS.BASE_TEST);
       const status = await provider.getStatus();
 
       expect(status.connected).toBe(true);
       expect(status.modelInfo).toBeDefined();
-      expect(status.modelInfo?.name).toBe("test-model");
+      expect(status.modelInfo?.name).toBe(MODEL_NAMES.TEST_MODEL);
     });
 
     it("should get status with invalid config", async () => {
@@ -466,21 +478,21 @@ describe("BaseLLMProvider", () => {
     });
 
     it("should handle completion request", async () => {
-      const provider = new TestProvider({ apiKey: "test-key" });
+      const provider = new TestProvider(TEST_CONFIGS.BASE_TEST);
       const params: CompletionRequestParams = {
-        prompt: "test prompt",
-        suggestionId: "test-suggestion-id",
+        prompt: TEST_PROMPTS.TEST_PROMPT,
+        suggestionId: TEST_RESPONSES.SUGGESTION_ID,
       };
 
       const result = await provider.completionRequest(params);
 
       expect(result).toBeDefined();
-      expect(result.predictions).toContain("test completion");
-      expect(result.suggestionId).toBe("test-suggestion-id");
+      expect(result.predictions).toContain(TEST_RESPONSES.COMPLETION);
+      expect(result.suggestionId).toBe(TEST_RESPONSES.SUGGESTION_ID);
     });
 
     it("should handle chat request", async () => {
-      const provider = new TestProvider({ apiKey: "test-key" });
+      const provider = new TestProvider(TEST_CONFIGS.BASE_TEST);
       const params: ChatRequestParams = {
         message: "Hello",
         conversationId: "conv-123",
@@ -488,40 +500,40 @@ describe("BaseLLMProvider", () => {
 
       const result = await provider.chatRequest(params);
 
-      expect(result.message).toBe("test response");
+      expect(result.message).toBe(TEST_RESPONSES.MESSAGE);
       expect(result.conversationId).toBe("conv-123");
-      expect(result.model).toBe("test-model");
+      expect(result.model).toBe(MODEL_NAMES.TEST_MODEL);
     });
 
     it("should handle chat request without conversationId", async () => {
-      const provider = new TestProvider({ apiKey: "test-key" });
+      const provider = new TestProvider(TEST_CONFIGS.BASE_TEST);
       const params: ChatRequestParams = {
         message: "Hello",
       };
 
       const result = await provider.chatRequest(params);
 
-      expect(result.conversationId).toBe("default-id");
+      expect(result.conversationId).toBe(TEST_RESPONSES.CONVERSATION_ID_DEFAULT);
     });
 
     it("should handle playbook generation", async () => {
-      const provider = new TestProvider({ apiKey: "test-key" });
+      const provider = new TestProvider(TEST_CONFIGS.BASE_TEST);
       const params: GenerationRequestParams = {
-        prompt: "Install nginx",
+        prompt: TEST_PROMPTS.INSTALL_NGINX,
         type: "playbook",
       };
 
       const result = await provider.generatePlaybook(params);
 
       expect(result.content).toContain("playbook");
-      expect(result.outline).toBe("1. Test step");
-      expect(result.model).toBe("test-model");
+      expect(result.outline).toBe(TEST_CONTENT.OUTLINE_DEFAULT);
+      expect(result.model).toBe(MODEL_NAMES.TEST_MODEL);
     });
 
     it("should handle playbook generation with outline", async () => {
-      const provider = new TestProvider({ apiKey: "test-key" });
+      const provider = new TestProvider(TEST_CONFIGS.BASE_TEST);
       const params: GenerationRequestParams = {
-        prompt: "Install nginx",
+        prompt: TEST_PROMPTS.INSTALL_NGINX,
         type: "playbook",
         outline: "1. Step one\n2. Step two",
       };
@@ -532,23 +544,23 @@ describe("BaseLLMProvider", () => {
     });
 
     it("should handle role generation", async () => {
-      const provider = new TestProvider({ apiKey: "test-key" });
+      const provider = new TestProvider(TEST_CONFIGS.BASE_TEST);
       const params: GenerationRequestParams = {
-        prompt: "Create a role",
+        prompt: TEST_PROMPTS.CREATE_ROLE,
         type: "role",
       };
 
       const result = await provider.generateRole(params);
 
       expect(result.content).toContain("role");
-      expect(result.outline).toBe("1. Test step");
-      expect(result.model).toBe("test-model");
+      expect(result.outline).toBe(TEST_CONTENT.OUTLINE_DEFAULT);
+      expect(result.model).toBe(MODEL_NAMES.TEST_MODEL);
     });
 
     it("should handle role generation with outline", async () => {
-      const provider = new TestProvider({ apiKey: "test-key" });
+      const provider = new TestProvider(TEST_CONFIGS.BASE_TEST);
       const params: GenerationRequestParams = {
-        prompt: "Create a role",
+        prompt: TEST_PROMPTS.CREATE_ROLE,
         type: "role",
         outline: "1. Setup\n2. Configure",
       };
