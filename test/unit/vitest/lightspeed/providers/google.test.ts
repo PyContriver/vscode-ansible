@@ -1,23 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import * as Module from "module";
 
-// Create mock implementations - these need to be defined before vi.mock() calls
-const mockGenerateContent = vi.fn();
-const mockModels = {
-  generateContent: mockGenerateContent,
-};
-const mockGoogleGenAI = vi.fn(() => ({
-  models: mockModels,
-}));
-
-// Mock logger
-const mockLogger = {
-  info: vi.fn(),
-  error: vi.fn(),
-  warn: vi.fn(),
-  debug: vi.fn(),
-};
-
 // Mock AnsibleContextProcessor
 const mockEnhancePromptForAnsible = vi.fn((prompt: string, context?: string, ansibleContext?: any) => {
   return `enhanced: ${prompt} with context: ${context || "none"}`;
@@ -33,15 +16,6 @@ const mockAnsibleContextModule = {
     cleanAnsibleOutput: mockCleanAnsibleOutput,
   },
 };
-
-// Mock outline generators
-const mockGenerateOutlineFromPlaybook = vi.fn((playbook: string) => {
-  return "1. Task one\n2. Task two";
-});
-
-const mockGenerateOutlineFromRole = vi.fn((role: string) => {
-  return "1. Setup task\n2. Configure task";
-});
 
 // Store original require
 const originalRequire = Module.prototype.require;
@@ -62,7 +36,6 @@ Module.prototype.require = function (this: any, id: string) {
   return originalRequire.call(this, id);
 } as any;
 
-// Use vi.mock for ES modules - these are hoisted
 vi.mock("@google/genai", () => {
   // Create a proper constructor class that can be instantiated with 'new'
   const generateContentMock = vi.fn();
@@ -628,10 +601,6 @@ describe("GoogleProvider", () => {
 
       await provider.generateRole(params);
 
-      // The enhancePromptForAnsible is called with 3 parameters:
-      // 1. prompt (string containing outline)
-      // 2. context (string, can be empty)
-      // 3. ansibleContext (object with fileType, documentUri, workspaceContext)
       expect(mockEnhancePromptForAnsible).toHaveBeenCalledWith(
         expect.stringContaining(outline),
         expect.any(String),
