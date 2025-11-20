@@ -1,5 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import * as Module from "module";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
   LLMProviderFactory,
   ProviderType,
@@ -11,7 +10,7 @@ import {
 } from "../testConstants.js";
 
 // Mock AnsibleContextProcessor for providers that extend BaseLLMProvider
-const mockEnhancePromptForAnsible = vi.fn((prompt: string, context?: string) => {
+const mockEnhancePromptForAnsible = vi.fn((prompt: string, context?: string, ansibleContext?: any) => {
   return `enhanced: ${prompt} with context: ${context || "none"}`;
 });
 
@@ -19,38 +18,19 @@ const mockCleanAnsibleOutput = vi.fn((output: string) => {
   return output.trim().replace(/^```ya?ml\s*/i, "").replace(/```\s*$/, "");
 });
 
-const mockAnsibleContextModule = {
+// Use vi.mock for ES modules - these are hoisted
+vi.mock("../../../../../src/features/lightspeed/ansibleContext", () => ({
   AnsibleContextProcessor: {
     enhancePromptForAnsible: mockEnhancePromptForAnsible,
     cleanAnsibleOutput: mockCleanAnsibleOutput,
   },
-};
-
-// Store original require - MUST be done before any imports that use require()
-const originalRequire = Module.prototype.require;
-
-// Patch require() immediately to intercept "../ansibleContext" calls
-// This must happen before base.js is imported (which happens when providers are imported)
-Module.prototype.require = function (this: any, id: string) {
-  const normalizedId = id.replace(/\\/g, "/");
-  if (
-    id === "../ansibleContext" ||
-    normalizedId === "../ansibleContext" ||
-    normalizedId.endsWith("/ansibleContext") ||
-    normalizedId.endsWith("/ansibleContext.js") ||
-    normalizedId.includes("/ansibleContext") ||
-    normalizedId.includes("ansibleContext.js")
-  ) {
-    return mockAnsibleContextModule;
-  }
-  return originalRequire.call(this, id);
-} as any;
+}));
 
 // Reset mocks before each test
 beforeEach(() => {
   vi.clearAllMocks();
   mockEnhancePromptForAnsible.mockImplementation(
-    (prompt: string, context?: string) => {
+    (prompt: string, context?: string, ansibleContext?: any) => {
       return `enhanced: ${prompt} with context: ${context || "none"}`;
     },
   );
