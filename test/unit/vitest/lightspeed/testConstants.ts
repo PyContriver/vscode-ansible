@@ -2,6 +2,8 @@
  * Test constants and mock data for provider factory and base provider tests
  */
 
+import type { LightSpeedServiceSettings } from "../../../../src/interfaces/extensionSettings.js";
+
 // Model names
 export const MODEL_NAMES = {
   GEMINI_PRO: "gemini-1.5-pro",
@@ -81,17 +83,15 @@ export const DEFAULT_TIMEOUTS = {
   CUSTOM: 60000,
 } as const;
 
-// Test configuration objects
+// Partial test configuration objects (used by base provider tests)
 export const TEST_CONFIGS = {
   GOOGLE_MINIMAL: {
     apiKey: TEST_API_KEYS.GOOGLE,
-    suggestions: { enabled: true, waitWindow: 0 },
   },
   GOOGLE_FULL: {
     apiKey: TEST_API_KEYS.GOOGLE,
     modelName: MODEL_NAMES.GEMINI_PRO,
     timeout: 45000,
-    suggestions: { enabled: true, waitWindow: 0 },
   },
   GOOGLE_WITH_MODEL: {
     apiKey: TEST_API_KEYS.GOOGLE,
@@ -100,17 +100,73 @@ export const TEST_CONFIGS = {
   },
   WCA: {
     apiEndpoint: API_ENDPOINTS.WCA_DEFAULT,
-    suggestions: { enabled: true, waitWindow: 0 },
   },
   BASE_TEST: {
     apiKey: TEST_API_KEYS.TEST_KEY,
   },
 } as const;
 
+// Base LightSpeedServiceSettings with all required common properties
+export const BASE_LIGHTSPEED_SETTINGS: Omit<LightSpeedServiceSettings, "provider" | "apiKey" | "apiEndpoint"> = {
+  enabled: true,
+  modelName: undefined,
+  timeout: DEFAULT_TIMEOUTS.DEFAULT,
+  customHeaders: {},
+  suggestions: { enabled: true, waitWindow: 0 },
+};
+
+// Complete LightSpeedServiceSettings for common test scenarios
+export const TEST_LIGHTSPEED_SETTINGS = {
+  GOOGLE_MINIMAL: {
+    ...BASE_LIGHTSPEED_SETTINGS,
+    provider: PROVIDER_TYPES.GOOGLE,
+    apiKey: TEST_API_KEYS.GOOGLE,
+    apiEndpoint: "",
+  } as LightSpeedServiceSettings,
+  GOOGLE_FULL: {
+    ...BASE_LIGHTSPEED_SETTINGS,
+    provider: PROVIDER_TYPES.GOOGLE,
+    apiKey: TEST_API_KEYS.GOOGLE,
+    modelName: MODEL_NAMES.GEMINI_PRO,
+    timeout: 45000,
+    apiEndpoint: "",
+  } as LightSpeedServiceSettings,
+  GOOGLE_WITH_EMPTY_API_KEY: {
+    ...BASE_LIGHTSPEED_SETTINGS,
+    provider: PROVIDER_TYPES.GOOGLE,
+    apiKey: "",
+    apiEndpoint: "",
+  } as LightSpeedServiceSettings,
+  WCA: {
+    ...BASE_LIGHTSPEED_SETTINGS,
+    provider: PROVIDER_TYPES.WCA,
+    apiKey: "",
+    apiEndpoint: API_ENDPOINTS.WCA_DEFAULT,
+  } as LightSpeedServiceSettings,
+  UNSUPPORTED: {
+    ...BASE_LIGHTSPEED_SETTINGS,
+    provider: "unsupported" as string,
+    apiKey: "",
+    apiEndpoint: "",
+  } as LightSpeedServiceSettings,
+};
+
 // Google provider specific constants
 export const GOOGLE_PROVIDER = {
   NAME: "google",
   DISPLAY_NAME: "Google Gemini",
   PROVIDER_NAME: "Google Gemini",
+} as const;
+
+// Ansible test content
+export const ANSIBLE_CONTENT = {
+  SINGLE_TASK: "- name: Install nginx\n  ansible.builtin.package:\n    name: nginx\n    state: present",
+  MULTI_TASK: "- name: Task one\n  ansible.builtin.debug:\n    msg: 'First task'\n- name: Task two\n  ansible.builtin.debug:\n    msg: 'Second task'",
+  PLAYBOOK: "---\n- hosts: all\n  tasks:\n    - name: Install nginx\n      ansible.builtin.package:\n        name: nginx",
+  INVALID_YAML: "- name: Task\n  invalid: [unclosed",
+  YAML_WITH_CODE_BLOCK: "```yaml\n- name: Test task\n  ansible.builtin.debug:\n    msg: 'test'\n```",
+  YAML_WITH_EXPLANATION: "Here's the playbook:\n- name: Test task\n  ansible.builtin.debug:\n    msg: 'test'",
+  EMPTY: "",
+  NULL_YAML: "null",
 } as const;
 
