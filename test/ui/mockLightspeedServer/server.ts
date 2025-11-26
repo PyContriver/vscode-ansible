@@ -13,7 +13,6 @@ import * as winston from "winston";
 import morgan from "morgan";
 import yargs from "yargs";
 import { meMarkdown } from "./meMarkdown";
-import { googleGenerateContent } from "./googleGenerateContent";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export let options: any = readOptions(process.argv.splice(2));
@@ -143,20 +142,6 @@ export default class Server {
       res.send({
         feedbacks: getFeedbacks(),
       });
-    });
-
-    // Google Gemini API endpoints (for Google provider testing)
-    // POST /v1beta/models/{model}:generateContent
-    // Express doesn't support colons in path parameters, so we use a catch-all route
-    // and check the path manually
-    app.post(/^\/v1beta\/models\/.*(?:generateContent|:generateContent)$/, async (req, res) => {
-      // Extract model name from path (e.g., "gemini-2.5-flash" from "/v1beta/models/gemini-2.5-flash:generateContent")
-      const pathMatch = req.path.match(/\/v1beta\/models\/([^/:]+)/);
-      if (pathMatch) {
-        req.params = { model: pathMatch[1] };
-      }
-      await new Promise((r) => setTimeout(r, 100)); // Simulate API delay
-      return googleGenerateContent(req, res);
     });
 
     app.post("/__debug__/options", (req, res) => {
