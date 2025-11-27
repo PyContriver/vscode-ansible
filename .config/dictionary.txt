@@ -54,6 +54,7 @@ equalto
 eslintcache
 extest
 fqcn
+genai
 githubcli
 haaaad
 highlightjs
@@ -76,6 +77,8 @@ modelines
 mycollection
 mymodule
 mynamespace
+myorg
+myproject
 nocolor
 noheading
 norecursedirs
