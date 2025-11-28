@@ -319,11 +319,6 @@ describe("WebviewMessageHandlers", () => {
     });
   });
 
-  // Note: File/Folder handler tests that require vscode.window.showOpenDialog
-  // are integration tests and would require more extensive vscode API mocking.
-  // The message routing is tested above, and these handlers are thin wrappers
-  // around vscode APIs.
-
   describe("Editor handlers", () => {
     it("should handle openEditor", async () => {
       const message = {

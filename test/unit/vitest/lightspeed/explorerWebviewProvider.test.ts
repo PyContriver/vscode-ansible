@@ -6,7 +6,6 @@ import type { SettingsManager } from "../../../../src/settings";
 import {
   PROVIDER_TYPES,
   TEST_LIGHTSPEED_SETTINGS,
-  GOOGLE_PROVIDER,
 } from "./testConstants";
 
 // Mock vscode module

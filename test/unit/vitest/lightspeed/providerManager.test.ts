@@ -13,7 +13,6 @@ import {
   TEST_RESPONSES,
 } from "./testConstants";
 
-// Mock providerFactory - must use hardcoded values (hoisted)
 vi.mock("../../../../src/features/lightspeed/providers/factory", () => {
   const mockGoogleProvider: LLMProvider = {
     name: "google",
