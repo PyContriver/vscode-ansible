@@ -115,6 +115,7 @@ function retry_command() {
 function refresh_settings() {
     local test_path=$1
     local test_id=$2
+    local storage_dir=${3:-out/test-resources}
     cp test/testFixtures/settings.json out/settings.json
     sed -i.bak 's/"ansible.lightspeed.enabled": .*/"ansible.lightspeed.enabled": false,/' out/settings.json
     sed -i.bak 's/"ansible.lightspeed.suggestions.enabled": .*/"ansible.lightspeed.suggestions.enabled": false,/' out/settings.json
@@ -126,7 +127,6 @@ function refresh_settings() {
     if [ "${TEST_LIGHTSPEED_URL}" != "" ]; then
         sed -i.bak "s,https://c.ai.ansible.redhat.com,$TEST_LIGHTSPEED_URL," out/settings.json
     fi
-    rm -rf out/test-resources/settings/ >/dev/null
     cp -f out/settings.json "out/log/${test_id}-settings.json"
 }
 
@@ -211,14 +211,24 @@ if [[ "${TEST_TYPE}" == "ui" ]]; then
         export TEST_ID
         {
             log notice "Testing ${test_file}"
-            log notice "Cleaning existing User settings..."
-            rm -rfv ./out/test-resources/settings/User/ > /dev/null
+            
+            # Kill any lingering ChromeDriver and test processes
+            pkill -9 -f "chromedriver\|extest\|Electron.*test-resources" 2>/dev/null || true
+            sleep 2
+            
+            # Clean up settings directory and lock files
+            rm -rf ./out/test-resources/settings/ >/dev/null 2>&1 || true
+            find ./out/test-resources -name "*.lock" -o -name "SingletonLock" -o -name "lockfile" -delete 2>/dev/null || true
 
             if [[ "$MOCK_LIGHTSPEED_API" == "1" ]]; then
                 stop_server
                 start_server
             fi
             refresh_settings "${test_file}" "${TEST_ID}"
+            
+            # Remove settings directory right before extest runs to ensure it's created fresh
+            rm -rf ./out/test-resources/settings/ >/dev/null 2>&1 || true
+            
             timeout --kill-after=15 --preserve-status 150s npm exec -- extest run-tests "${COVERAGE_ARG}" \
                 --mocha_config test/ui/.mocharc.js \
                 -s out/test-resources \
