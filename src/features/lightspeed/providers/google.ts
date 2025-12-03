@@ -68,6 +68,9 @@ export class GoogleProvider extends BaseLLMProvider {
     this.logger.error(
       `[Google Provider] ${operation} error details: ${JSON.stringify(error, null, 2)}`,
     );
+    console.log(
+      `[Google Provider] ${operation} error details: ${JSON.stringify(error, null, 2)}`,
+    );
     // Use the reusable HTTP error handler from base class
     return this.handleHttpError(error, operation, "Google Gemini");
   }
