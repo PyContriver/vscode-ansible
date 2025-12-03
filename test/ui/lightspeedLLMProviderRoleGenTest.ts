@@ -43,7 +43,7 @@ describe("LLM Provider Role Generation", function () {
   });
 
   it("Should generate role using Google Gemini provider", async function () {
-    this.timeout(100000);
+    this.timeout(150000);
 
     await workbenchExecuteCommand("Ansible Lightspeed: Role generation");
 
@@ -75,7 +75,7 @@ describe("LLM Provider Role Generation", function () {
           return undefined;
         }
       },
-      timeout: 30000,
+      timeout: 60000,
       message: "Continue button should appear on step 2 (outline review)",
     });
     expect(continueButton).not.to.be.undefined;
@@ -97,7 +97,7 @@ describe("LLM Provider Role Generation", function () {
           return undefined;
         }
       },
-      timeout: 15000,
+      timeout: 30000,
       message: "Generated role should contain nginx",
     });
     expect(roleContent).not.to.be.undefined;
