@@ -179,7 +179,7 @@ tasks:
     cmds:
       - task: package
       - "{{.VIRTUAL_ENV}}/bin/python3 --version"
-      - '{{.XVFB}}bash -c ''. "{{.VIRTUAL_ENV}}/bin/activate" &&  COVERAGE=1 MOCK_LIGHTSPEED_API=1 TEST_TYPE=e2e ./tools/test-launcher.sh'''
+      - '{{.XVFB}}bash -c ''. "{{.VIRTUAL_ENV}}/bin/activate" &&  COVERAGE=1 MOCK_LIGHTSPEED_API=1 MOCK_LLM_PROVIDER_API=1 TEST_TYPE=e2e ./tools/test-launcher.sh'''
     interactive: true
   test-ui:
     desc: Run UI tests {{.XVFB}}
@@ -187,7 +187,7 @@ tasks:
     cmds:
       - task: package
       - "{{.VIRTUAL_ENV}}/bin/python3 --version"
-      - ' {{.XVFB}}bash -c ''. "{{.VIRTUAL_ENV}}/bin/activate" && COVERAGE=1 MOCK_LIGHTSPEED_API=1 ./tools/test-launcher.sh'''
+      - ' {{.XVFB}}bash -c ''. "{{.VIRTUAL_ENV}}/bin/activate" && COVERAGE=1 MOCK_LIGHTSPEED_API=1 MOCK_LLM_PROVIDER_API=1 ./tools/test-launcher.sh'''
     interactive: true
   test-unit:
     desc: Run unit tests with coverage report
